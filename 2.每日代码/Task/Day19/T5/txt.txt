@@ -1,0 +1,5 @@
+mkdir -p ~/my_project/src ~/my_project/docs ~/my_project/tmp/logs && cd ~/my_project
+
+vim ./src/main.c && cd ./docs
+
+vim README.md LICENSE.txt CHANGES.md
