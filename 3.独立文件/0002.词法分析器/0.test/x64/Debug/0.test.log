@@ -1,0 +1,4 @@
+﻿  main.c
+D:\VS CODE\C++71_CODE\Project\词法分析器\0.test\main.c(17,8): warning C4133: “函数”: 从“int [1024]”到“char *”的类型不兼容
+D:\VS CODE\C++71_CODE\Project\词法分析器\0.test\main.c(19,9): warning C4477: “printf”: 格式字符串“%s”需要类型“char *”的参数，但可变参数 1 拥有了类型“int *”
+  0.test.vcxproj -> D:\VS CODE\C++71_CODE\Project\词法分析器\x64\Debug\0.test.exe

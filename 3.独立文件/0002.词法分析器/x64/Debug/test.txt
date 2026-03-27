@@ -1,0 +1,144 @@
+// 用于检查当前扫描的Token的类型是不是type 如果是就返回type
+static TokenType checkKeyword(int start, int length, const char *rest, TokenType type) {
+	/*
+		start: 待检查序列的起始字符下标
+			比如要检查关键字break，那么在case b的前提下，需要传入reak来进行检查
+			这里start就等于1，scanner.start[1]
+		length: 待检查序列的长度，如果检查的是break，就是检查剩余的reak
+			需要传入4
+		rest指针，待检查的剩余序列字符串，这里直接传入一个字面值字符串就行了
+			比如检查break，传入"reak"就好了
+		type：你要检查的关键字Token的类型，比如检查break，那就传入Token_BREAK
+
+		检查从start位置开始，长度为length的字符串是否与给定的rest字符串相匹配
+		先判断长度是否一致 再判断内容
+	*/
+	if (scanner.current - scanner.start == start + length &&
+		/*
+					int memcmp(const void *s1, const void *s2, size_t n);
+					这里的参数分别是：
+
+					s1：指向第一块内存区域的指针。
+					s2：指向第二块内存区域的指针。
+					n：要比较的字节数。
+					memcmp 函数会逐字节比较 s1 和 s2 指向的内存区域，直到有不相等的字节或比较了 n 个字节为止。
+					如果两个内存区域完全相同，
+					则 memcmp 返回 0；如果第一个不同的字节在 s1 中的值小于 s2 中对应的值，返回负数；
+					反之，返回正数。
+		*/
+		memcmp(scanner.start + start, rest, length) == 0) {
+		return type;
+	}
+	return TOKEN_IDENTIFIER;
+}
+
+static TokenType identifierType() {
+	// 确定identifier类型主要有两种方式：
+	// 1. 将所有的关键字放入哈希表中，然后查表确认 
+	// Key-Value 就是"关键字-TokenType" 可以做 但存在额外内存占用且效率不如下一个方式好
+	// 2. 将所有的关键字放入Trie树(读踹，字典查找树)中，然后查表确认
+	// Trie树的方式不管是空间上还是时间上都优于哈希表的方式
+	char c = scanner.start[0];
+	// 用switch...switch...if组合构建逻辑上的trie树
+	switch (c) {
+		// keywords
+	case 'b': return checkKeyword(1, 4, "reak", TOKEN_BREAK);
+	case 'c': {
+		int len = scanner.current - scanner.start;
+		if (len > 1) {
+			switch (scanner.start[1]) {
+			case 'a': return checkKeyword(2, 2, "se", TOKEN_CASE);
+			case 'h': return checkKeyword(2, 2, "ar", TOKEN_CHAR);
+			case 'o':
+				if (len > 3 && scanner.start[2] == 'n') {
+					switch (scanner.start[3]) {
+					case 's': return checkKeyword(4, 1, "t", TOKEN_CONST);
+					case 't': return checkKeyword(4, 4, "inue", TOKEN_CONTINUE);
+					}
+				}
+			}
+		}
+		break;
+	}
+	case 'd': {
+		int len = scanner.current - scanner.start;
+		if (len > 1) {
+			switch (scanner.start[1]) {
+			case 'e': return checkKeyword(2, 5, "fault", TOKEN_DEFAULT);
+			case 'o':
+				if (len == 2) return TOKEN_DO;
+				else return checkKeyword(2, 4, "uble", TOKEN_DOUBLE);
+			}
+		}
+		break;
+	}
+	case 'e': {
+		int len = scanner.current - scanner.start;
+		if (len > 1) {
+			switch (scanner.start[1]) {
+			case 'l': return checkKeyword(2, 2, "se", TOKEN_ELSE);
+			case 'n': return checkKeyword(2, 2, "um", TOKEN_ENUM);
+			}
+		}
+		break;
+	}
+	case 'f': {
+		int len = scanner.current - scanner.start;
+		if (len > 1) {
+			switch (scanner.start[1]) {
+			case 'l': return checkKeyword(2, 3, "oat", TOKEN_FLOAT);
+			case 'o': return checkKeyword(2, 1, "r", TOKEN_FOR);
+			}
+		}
+		break;
+	}
+	case 'g': return checkKeyword(1, 3, "oto", TOKEN_GOTO);
+	case 'i': {
+		int len = scanner.current - scanner.start;
+		if (len > 1) {
+			switch (scanner.start[1]) {
+			case 'f': return checkKeyword(2, 0, "", TOKEN_IF);
+			case 'n': return checkKeyword(2, 1, "t", TOKEN_INT);
+			}
+		}
+		break;
+	}
+	case 'l': return checkKeyword(1, 3, "ong", TOKEN_LONG);
+	case 'r': return checkKeyword(1, 5, "eturn", TOKEN_RETURN);
+	case 's': {
+		int len = scanner.current - scanner.start;
+		if (len > 1) {
+			switch (scanner.start[1]) {
+			case 'h': return checkKeyword(2, 3, "ort", TOKEN_SHORT);
+			case 'i':
+				if (len > 2) {
+					switch (scanner.start[2]) {
+					case 'g': return checkKeyword(3, 3, "ned", TOKEN_SIGNED);
+					case 'z': return checkKeyword(3, 3, "eof", TOKEN_SIZEOF);
+					}
+				}
+				break;
+			case 't': return checkKeyword(2, 4, "ruct", TOKEN_STRUCT);
+			case 'w': return checkKeyword(2, 4, "itch", TOKEN_SWITCH);
+			}
+		}
+		break;
+	}
+	case 't': return checkKeyword(1, 6, "ypedef", TOKEN_TYPEDEF);
+	case 'u': {
+		int len = scanner.current - scanner.start;
+		if (len > 2 && scanner.start[1] == 'n') {
+			switch (scanner.start[2]) {
+			case 'i': return checkKeyword(3, 2, "on", TOKEN_UNION);
+			case 's': return checkKeyword(3, 5, "igned", TOKEN_UNSIGNED);
+			}
+		}
+		break;
+	}
+	case 'v': return checkKeyword(1, 3, "oid", TOKEN_VOID);
+	case 'w': return checkKeyword(1, 4, "hile", TOKEN_WHILE);
+	}
+
+	// 没有在上面switch中返回，那肯定不是关键字，而是标识符
+	return TOKEN_IDENTIFIER;
+}

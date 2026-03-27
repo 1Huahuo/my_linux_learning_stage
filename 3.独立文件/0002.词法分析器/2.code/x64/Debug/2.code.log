@@ -1,0 +1,8 @@
+﻿  main.c
+D:\VS CODE\C++71_CODE\Project\词法分析器\2.code\main.c(71,19): warning C4473: “fprintf”: 没有为格式字符串传递足够的参数
+      D:\VS CODE\C++71_CODE\Project\词法分析器\2.code\main.c(71,19):
+      占位符和其参数预计 1 可变参数，但提供的却是 0 参数
+      D:\VS CODE\C++71_CODE\Project\词法分析器\2.code\main.c(71,19):
+      缺失的可变参数 1 为格式字符串“%s”所需
+  
+  2.code.vcxproj -> D:\VS CODE\C++71_CODE\Project\词法分析器\x64\Debug\2.code.exe
