@@ -1,5 +1,10 @@
 #include <my_header.h>
-
+/*
+存在两个生产者, 三个消费者;
+生产者每隔3秒生产一个商品, 容器满则等待;
+消费者,在前5秒不消费, 5秒之后, 每隔一秒消费一个商品, 无商品则等待;
+容器初始10个商品, 最大上限20个商品
+*/
 typedef struct node_s{ // 商品结点
     int value;
     struct node_s* next;
