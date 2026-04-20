@@ -57,7 +57,13 @@ void cmd_gets(int fd, const char* remote_path){
 }
 
 void cmd_remove(int fd){
-
+    char response[1024] = {0};
+    ssize_t ret = recv(fd, response, sizeof(response), 0);
+    if (ret > 0) {
+        printf("%s", response);
+    } else {
+        printf("remove: no response\n");
+    }
 }
 
 void cmd_pwd(int fd){
