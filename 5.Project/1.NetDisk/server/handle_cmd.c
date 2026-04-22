@@ -3,9 +3,16 @@
 
 void handle_user(CmdType cmd, char* username, Session* sess) {
     char password[256] = {0};
-    ssize_t ret = recv(sess->fd, password, sizeof(password), MSG_WAITALL);
+    int len;
+    recv(sess->fd, &len, sizeof(len), MSG_WAITALL);
+    ssize_t ret = recv(sess->fd, password, len, MSG_WAITALL);
+    password[sizeof(password) - 1] = '\0';
+    /* printf("ret = %zd, password = %s\n", ret, password); */
     if (ret <= 0)
         return;
+    else {
+        password[sizeof(password) - 1] = '\0';
+    }
 
     if (cmd == CMD_REGISTER) {
         // 检查用户名是否已存在
@@ -16,10 +23,10 @@ void handle_user(CmdType cmd, char* username, Session* sess) {
             return;
         }
         // 生成盐
-        char salt[33];
+        char salt[33] = {0};
         generate_salt(salt, 32);
         // 计算哈希
-        char hash[65];
+        char hash[65] = {0};
         compute_password_hash(password, salt, hash);
 
         // 插入数据库
@@ -48,14 +55,17 @@ void handle_user(CmdType cmd, char* username, Session* sess) {
         }
     } 
     else if (cmd == CMD_LOGIN) {
-        UserInfo user; // 查用户表并拿取用户信息
+        UserInfo user; // !不要忘记初始置为0，防止hash数组的最后一个字符不为'\0'
+        bzero(&user, sizeof(user));
+        // 查用户表并拿取用户信息
         if (!user_find_by_name(username, &user)) {
             char msg[] = "Username not found.\n";
             send(sess->fd, msg, strlen(msg), MSG_NOSIGNAL);
             return;
         }
-        char hash[65];
+        char hash[65] = {0};
         compute_password_hash(password, user.salt, hash);
+        hash[sizeof(hash) - 1] = '\0';
         if (strcmp(hash, user.passwd_hash) == 0) { // 校验密码是否正确
             sess->logged_in = 1;
             strcpy(sess->user_name, username);

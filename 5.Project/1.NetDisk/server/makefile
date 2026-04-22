@@ -15,7 +15,7 @@ TARGET = main
 
 # 链接所有 .o 生成 main
 $(TARGET): $(OBJ)
-	$(CC) $^ -o $@ -lpthread -lmysqlclient -lcrypto
+	$(CC) $^ -o $@ -lpthread -lmysqlclient -lcrypto -lssl
 
 # 自动推导规则：.c → .o（不需要写每个文件）
 %.o: %.c

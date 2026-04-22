@@ -2,7 +2,7 @@
 CC = gcc
 
 # 编译选项：开启警告 + 调试信息
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g -DOPENSSL_SUPPRESS_DEPRECATED
 
 # 自动找到当前目录下 所有 .c 文件
 SRC := $(wildcard *.c)
@@ -15,7 +15,7 @@ TARGET = main
 
 # 链接所有 .o 生成 main
 $(TARGET): $(OBJ)
-	$(CC) $^ -o $@ -lpthread -lmysqlclient -lcrypto
+	$(CC) $^ -o $@ -lpthread -lmysqlclient -lcrypto -lssl
 
 # 自动推导规则：.c → .o（不需要写每个文件）
 %.o: %.c
